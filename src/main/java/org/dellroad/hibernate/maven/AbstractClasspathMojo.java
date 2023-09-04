@@ -19,7 +19,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Comparator;
 import java.util.Set;
-import java.util.TreeSet;
+import java.util.LinkedHashSet;
 
 /**
  * Support superclass for mojo's that need to put stuff (depenedencies, etc.) on the classpath.
@@ -40,12 +40,16 @@ public abstract class AbstractClasspathMojo extends AbstractMojo {
     public final void execute() throws MojoExecutionException, MojoFailureException {
 
         // Get classpath elements
-        final TreeSet<URL> urls = new TreeSet<>(Comparator.comparing(URL::toString));   // sort URLs to aid in debugging
+        final LinkedHashSet<URL> urls = new LinkedHashSet<>();
         try {
             this.addClasspathElements(urls);
         } catch (DependencyResolutionRequiredException e) {
             throw new MojoExecutionException("error adding classpath elements: " + e.getMessage(), e);
         }
+
+        // Debug
+        this.getLog().debug(this.getClass().getSimpleName() + ": classpath for execution:");
+        urls.forEach(url -> this.getLog().debug("  " + url));
 
         // Create corresponding class loader and execute
         final ClassLoader contextLoader = Thread.currentThread().getContextClassLoader();

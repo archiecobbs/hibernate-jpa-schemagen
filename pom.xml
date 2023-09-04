@@ -18,6 +18,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <hibernate.version>6.2.7.Final</hibernate.version>
+        <validation-api.version>3.0.2</validation-api.version>
 
         <extra.enforcer.rules.version>1.5.1</extra.enforcer.rules.version>
         <maven.artifact.version>3.9.4</maven.artifact.version>
@@ -88,6 +89,13 @@
             <groupId>org.hibernate.tool</groupId>
             <artifactId>hibernate-tools-orm</artifactId>
             <version>${hibernate.version}</version>
+        </dependency>
+
+        <!-- Validation API (dependency missing from Hibernate) -->
+        <dependency>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+            <version>${validation-api.version}</version>
         </dependency>
 
         <!-- Plugin stuff -->
