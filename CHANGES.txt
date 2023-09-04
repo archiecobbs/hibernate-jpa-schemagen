@@ -1,4 +1,4 @@
-Version Next
+Version 6.3.0 Released September 4, 2023
 
     - Delete the output file to ensure it actually gets (re)generated
     - Work around issue where Maven passes empty parameters as null

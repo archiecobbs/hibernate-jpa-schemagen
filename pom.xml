@@ -17,7 +17,7 @@
         <java.version>11</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <hibernate.version>6.3.0-SNAPSHOT</hibernate.version>
+        <hibernate.version>6.3.0.CR1</hibernate.version>
         <validation-api.version>3.0.2</validation-api.version>
 
         <extra.enforcer.rules.version>1.5.1</extra.enforcer.rules.version>
