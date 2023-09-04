@@ -12,11 +12,9 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.tools.ant.BuildException;
 import org.hibernate.cfg.AvailableSettings;
-import org.hibernate.tool.api.export.Exporter;
-import org.hibernate.tool.api.export.ExporterConstants;
-import org.hibernate.tool.api.export.ExporterFactory;
-import org.hibernate.tool.api.export.ExporterType;
 import org.hibernate.tool.api.metadata.MetadataDescriptor;
+import org.hibernate.tool.hbm2x.Exporter;
+import org.hibernate.tool.hbm2x.Hbm2DDLExporter;
 import org.hibernate.tool.internal.metadata.JpaMetadataDescriptor;
 
 import java.io.File;
@@ -189,26 +187,26 @@ public class ExportJpaMojo extends AbstractMojo {
 // Subclass Hooks
 
     protected Exporter createExporter(Properties properties) {
-        final Exporter exporter = ExporterFactory.createExporter(ExporterType.DDL);
+        final Hbm2DDLExporter exporter = new Hbm2DDLExporter();
         exporter.getProperties().putAll(properties);
         return exporter;
     }
 
-    protected void configureExporter(Exporter exporter, Properties properties, MetadataDescriptor metadataDescriptor) {
+    protected void configureExporter(Exporter exporter0, Properties properties, MetadataDescriptor metadataDescriptor) {
+        final Hbm2DDLExporter exporter = (Hbm2DDLExporter)exporter0;
         exporter.getProperties().putAll(properties);
-        exporter.getProperties().put(ExporterConstants.DESTINATION_FOLDER,
-          Optional.ofNullable(this.outputFile.getParentFile()).orElseGet(() -> new File(".")));
-        exporter.getProperties().put(ExporterConstants.METADATA_DESCRIPTOR, metadataDescriptor);
-        exporter.getProperties().put(ExporterConstants.TEMPLATE_PATH, new String[0]);
-        exporter.getProperties().put(ExporterConstants.EXPORT_TO_DATABASE, false);
-        exporter.getProperties().put(ExporterConstants.EXPORT_TO_CONSOLE, false);
-        exporter.getProperties().put(ExporterConstants.SCHEMA_UPDATE, false);
-        exporter.getProperties().put(ExporterConstants.DELIMITER, this.delimiter);
-        exporter.getProperties().put(ExporterConstants.DROP_DATABASE, this.drop);
-        exporter.getProperties().put(ExporterConstants.CREATE_DATABASE, true);
-        exporter.getProperties().put(ExporterConstants.FORMAT, this.format);
-        exporter.getProperties().put(ExporterConstants.OUTPUT_FILE_NAME, this.outputFile.getName());
-        exporter.getProperties().put(ExporterConstants.HALT_ON_ERROR, true);
+        exporter.setOutputDirectory(Optional.ofNullable(this.outputFile.getParentFile()).orElseGet(() -> new File(".")));
+        exporter.setMetadataDescriptor(metadataDescriptor);
+        exporter.setTemplatePath(new String[0]);
+        exporter.setExport(false);
+        exporter.setConsole(false);
+        exporter.setUpdate(false);
+        exporter.setDelimiter(this.delimiter);
+        exporter.setDrop(this.drop);
+        exporter.setCreate(true);
+        exporter.setFormat(this.format);
+        exporter.setOutputFileName(this.outputFile.getName());
+        exporter.setHaltonerror(true);
     }
 
     protected Properties readProperties() throws MojoExecutionException {
