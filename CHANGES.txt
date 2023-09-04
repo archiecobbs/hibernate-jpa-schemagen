@@ -1,0 +1,11 @@
+Version Next
+
+    - Delete the output file to ensure it actually gets (re)generated
+    - Work around issue where Maven passes empty parameters as null
+    - Add explicit validation-api dependency (missing from Hibernate)
+    - Put dependencies on the classpath during execution
+    - Add Maven enforcer to confirm the correct JDK version
+ 
+Version 6.3.0
+
+    - Initial release
