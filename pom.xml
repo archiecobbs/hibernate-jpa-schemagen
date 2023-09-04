@@ -18,10 +18,50 @@
 
         <maven.artifact.version>3.9.4</maven.artifact.version>
         <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
+        <maven.gpg.plugin.version>3.1.0</maven.gpg.plugin.version>
         <maven.plugin-api.version>3.9.4</maven.plugin-api.version>
         <maven.plugin.tools.version>3.9.0</maven.plugin.tools.version>
         <maven.project.version>3.0-alpha-2</maven.project.version>
     </properties>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <issueManagement>
+        <system>GitHub Issues</system>
+        <url>https://github.com/archiecobbs/hibernate-jpa-schemagen/issues</url>
+    </issueManagement>
+    <scm>
+        <url>https://github.com/archiecobbs/hibernate-jpa-schemagen/</url>
+        <connection>scm:git:git://github.com/archiecobbs/hibernate-jpa-schemagen.git</connection>
+        <developerConnection>scm:git:git://github.com/archiecobbs/hibernate-jpa-schemagen.git</developerConnection>
+    </scm>
+    <developers>
+        <developer>
+            <id>archie</id>
+            <name>Archie Cobbs</name>
+            <email>archie.cobbs@gmail.com</email>
+        </developer>
+    </developers>
+    <distributionManagement>
+        <downloadUrl>https://github.com/archiecobbs/hibernate-jpa-schemagen</downloadUrl>
+        <snapshotRepository>
+            <id>sonatype-nexus-snapshots</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>sonatype-nexus-staging</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+        <site>
+            <id>${project.artifactId}-site</id>
+            <url>https://github.com/archiecobbs/hibernate-jpa-schemagen/</url>
+        </site>
+    </distributionManagement>
 
     <dependencies>
 
@@ -87,4 +127,29 @@
             </plugin>
         </plugins>
     </build>
+    <profiles>
+
+        <!-- Maven Central requires signed artifacts -->
+        <profile>
+            <id>sign</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>${maven.gpg.plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
