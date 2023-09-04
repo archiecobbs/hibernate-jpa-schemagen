@@ -5,12 +5,13 @@
 
 package org.dellroad.hibernate.maven;
 
+import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.tools.ant.BuildException;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.tool.api.export.Exporter;
 import org.hibernate.tool.api.export.ExporterConstants;
@@ -22,17 +23,15 @@ import org.hibernate.tool.internal.metadata.JpaMetadataDescriptor;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
+import java.util.stream.Stream;
 
 /**
  * Mojo that writes the DDL schema to an output file based on JPA meta-data,
@@ -61,8 +60,10 @@ import java.util.Set;
  * <p>
  * Note: you can safely ignore any "The application must supply JDBC connections" exceptions.
  */
-@Mojo(name = "export-jpa-schema", defaultPhase = LifecyclePhase.PROCESS_CLASSES)
-public class ExportJpaMojo extends AbstractMojo {
+@Mojo(name = "export-jpa-schema",
+    requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME,
+    defaultPhase = LifecyclePhase.PROCESS_CLASSES)
+public class ExportJpaMojo extends AbstractClasspathMojo {
 
     /** JPA persistence unit name. */
     @Parameter
@@ -120,8 +121,23 @@ public class ExportJpaMojo extends AbstractMojo {
     @Parameter
     private List<Fixup> fixups = new ArrayList<>();
 
+// AbstractClasspathMojo
+
     @Override
-    public void execute() throws MojoExecutionException {
+    @SuppressWarnings("unchecked")
+    protected void addClasspathElements(Set<URL> elements) throws DependencyResolutionRequiredException {
+        elements.add(this.toURL(this.classRoot));
+        Stream.of(
+            (List<String>)this.project.getCompileClasspathElements(),
+            (List<String>)this.project.getRuntimeClasspathElements())
+          .flatMap(List::stream)
+          .map(File::new)
+          .map(this::toURL)
+          .forEach(elements::add);
+    }
+
+    @Override
+    protected void executeWithClasspath() throws MojoExecutionException {
 
         // Sanity check
         final File metaInf = new File(this.classRoot, "META-INF");
@@ -132,21 +148,17 @@ public class ExportJpaMojo extends AbstractMojo {
         // Get properties
         final Properties properties = this.readProperties();
 
-        // Run the rest with a temporary loader
-        this.runWithLoader(() -> {
+        // Create MetadataDescriptor
+        final MetadataDescriptor metadataDescriptor = this.createMetadataDescriptor(properties);
 
-            // Create MetadataDescriptor
-            final MetadataDescriptor metadataDescriptor = new JpaMetadataDescriptor(this.jpaUnit, properties);
+        // Create exporter
+        final Exporter exporter = this.createExporter(properties);
 
-            // Create exporter
-            final Exporter exporter = this.createExporter(properties);
+        // Configure exporter
+        this.configureExporter(exporter, properties, metadataDescriptor);
 
-            // Configure exporter
-            this.configureExporter(exporter, properties, metadataDescriptor);
-
-            // Run exporter
-            exporter.start();
-        });
+        // Run exporter
+        exporter.start();
         this.getLog().info("Wrote generated schema to " + this.outputFile);
 
         // Clean up
@@ -163,30 +175,11 @@ public class ExportJpaMojo extends AbstractMojo {
         this.verifyOutput();
     }
 
-    protected void runWithLoader(Runnable action) {
-
-        // Create a new loader that has visibility into <classRoot>
-        final ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
-        final URLClassLoader tempLoader = URLClassLoader.newInstance(new URL[] { this.toURL(this.classRoot) }, origLoader);
-
-        // Temporarily make this loader the current loader while we perform the action
-        Thread.currentThread().setContextClassLoader(tempLoader);
-        try {
-            action.run();
-        } finally {
-            Thread.currentThread().setContextClassLoader(origLoader);
-        }
-    }
-
-    protected URL toURL(File file) {
-        try {
-            return file.toURI().toURL();
-        } catch (MalformedURLException e) {
-            throw new RuntimeException("unexpected error", e);
-        }
-    }
-
 // Subclass Hooks
+
+    protected MetadataDescriptor createMetadataDescriptor(Properties properties) {
+        return new JpaMetadataDescriptor(this.jpaUnit, properties);
+    }
 
     protected Exporter createExporter(Properties properties) {
         final Exporter exporter = ExporterFactory.createExporter(ExporterType.DDL);
