@@ -1,0 +1,14 @@
+Version 6.2.2
+
+    - Delete the output file to ensure it actually gets (re)generated
+
+Version 6.2.1 Released September 4, 2023
+
+    - Work around issue where Maven passes empty parameters as null
+    - Add explicit validation-api dependency (missing from Hibernate)
+    - Put dependencies on the classpath during execution
+    - Add Maven enforcer to confirm the correct JDK version
+
+Version 6.2.0 Released September 3, 2023
+
+    - Initial release
