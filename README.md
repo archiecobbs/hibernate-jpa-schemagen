@@ -55,6 +55,16 @@ Example configuration:
     </executions>
 </plugin>
 ```
+Configuration options:
+* `<jpaUnit>` JPA persistence unit name. Required.
+* `<classRoot>` Directory where your classes and `META-INF/persistence.xml` can be found. Default `${project.build.directory}/classes`.
+* `<removePersistenceXml>` Remove the `META-INF/persistence.xml` used when done. Default false.
+* `<propertyFile>` Optional properties file. Allows adding/overriding properties configured by the plugin.
+* `<outputFile>` Output file. Default `${project.build.directory}/generated-resources/schema.ddl`.
+* `<verifyFile>` Verification file. Default `${project.basedir}/src/schema/schema.ddl`.
+* `<drop>` Include `DROP TABLE` statements. Default false.
+* `<delimiter>` The delimiter that separates SQL statements. Default `;`.
+* `<format>` Whether to format SQL statements. Default true.
 
 The plugin runs by default in the `process-classes` Maven lifecycle phase.
 
