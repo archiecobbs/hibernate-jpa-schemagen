@@ -25,7 +25,7 @@ What this Maven plugin does:
 
 ### Configuring the Plugin
 
-The versions of this plugin match the versions of Hibernate itself, so you can use the same version property.
+Each version of this plugin has a version number that matches the version of Hibernate against which it was compiled, so you should use the same version (or something similar) as with Hibernate itself.
 
 Example configuration:
 ```xml
@@ -66,7 +66,7 @@ Configuration options:
 * `<delimiter>` The delimiter that separates SQL statements. Default `;`.
 * `<format>` Whether to format SQL statements. Default true.
 
-The plugin runs by default in the `process-classes` Maven lifecycle phase.
+By defalt, the plugin runs in the `process-classes` Maven lifecycle phase.
 
 ### `META-INF/persistence.xml`
 
