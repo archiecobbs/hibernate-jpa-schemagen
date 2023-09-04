@@ -25,14 +25,14 @@ What this Maven plugin does:
 
 ### Configuring the Plugin
 
-Each version of this plugin has a version number that matches the version of Hibernate against which it was compiled, so you should use the same version (or something similar) as with Hibernate itself.
+Each version of this plugin has a version number that matches the version of Hibernate against which it was compiled in the major and minor components (i.e., first two numbers), so for example for Hibernate version `6.2.7.Final` you should use the latest 6.2.x version of this plugin.
 
 Example configuration:
 ```xml
 <plugin>
     <groupId>org.dellroad</groupId>
     <artifactId>hibernate-jpa-schemagen</artifactId>
-    <version>${hibernate.version}</version>
+    <version>[6.2.0,6.3)</version>
     <executions>
         <execution>
             <id>schema_verify</id>
