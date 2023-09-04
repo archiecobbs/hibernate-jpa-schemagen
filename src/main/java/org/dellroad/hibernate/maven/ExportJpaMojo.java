@@ -155,6 +155,9 @@ public class ExportJpaMojo extends AbstractClasspathMojo {
         // Configure exporter
         this.configureExporter(exporter, properties, metadataDescriptor);
 
+        // Delete the output file to ensure it actually gets (re)generated
+        this.outputFile.delete();
+
         // Run exporter
         exporter.start();
         this.getLog().info("Wrote generated schema to " + this.outputFile);
