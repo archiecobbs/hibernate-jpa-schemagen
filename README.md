@@ -6,8 +6,11 @@ Sensible Maven schema DDL generator for projects using Hibernate and JPA
 This Maven plugin tries to address the following scenario:
 
 * You are building a project using Hibernate and JPA
-* You want to automatically generate and validate a schema DDL file during the build
-* You want your build to fail if you unknowingly change the generated schema (because a migration will also be needed)
+* You want to automatically generate a schema DDL file during the build
+* You want to compare the generated schema to an expected output
+* You want the build to fail if there are any differences, because that means either:
+  * You made an unintentional change to one of your model classes, or
+  * You need to add a schema migration to accomodate the intended change
 
 And you might also have one of these issues:
 
@@ -32,7 +35,7 @@ Example configuration:
 <plugin>
     <groupId>org.dellroad</groupId>
     <artifactId>hibernate-jpa-schemagen</artifactId>
-    <version>[6.2.0,6.3)</version>
+    <version>6.2.1</version>
     <executions>
         <execution>
             <id>schema_verify</id>
