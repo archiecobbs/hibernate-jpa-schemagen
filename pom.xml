@@ -23,6 +23,7 @@
 
         <extra.enforcer.rules.version>1.5.1</extra.enforcer.rules.version>
         <maven.artifact.version>3.9.4</maven.artifact.version>
+        <maven.checkstyle.plugin.version>3.0.0</maven.checkstyle.plugin.version>
         <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
         <maven.enforcer.plugin.version>3.4.0</maven.enforcer.plugin.version>
         <maven.gpg.plugin.version>3.1.0</maven.gpg.plugin.version>
@@ -145,6 +146,8 @@
     </dependencies>
     <build>
         <plugins>
+
+            <!-- Compiler -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -171,6 +174,8 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <!-- Maven Enforcer -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
@@ -199,6 +204,35 @@
                                 </enforceBytecodeVersion>
                             </rules>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Checkstyle -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>${maven.checkstyle.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>checkstyle_verify</id>
+                        <phase>compile</phase>
+                        <configuration>
+                            <consoleOutput>true</consoleOutput>
+                            <failsOnError>true</failsOnError>
+                            <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                            <linkXRef>false</linkXRef>
+                            <includeResources>false</includeResources>
+                            <includeTestResources>false</includeTestResources>
+                            <sourceDirectories>
+                                <sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
+                                <sourceDirectory>${project.build.testSourceDirectory}</sourceDirectory>
+                            </sourceDirectories>
+                            <configLocation>${project.basedir}/src/checkstyle/checkstyle.xml</configLocation>
+                        </configuration>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
