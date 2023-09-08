@@ -219,6 +219,8 @@ public class ExportJpaMojo extends AbstractClasspathMojo {
     }
 
     protected void applyFixups(Properties properties) throws MojoExecutionException {
+        if (this.fixups.isEmpty())
+            return;
         this.getLog().info("Applying " + this.fixups.size() + " fixup(s) to " + this.outputFile);
         try {
             final String charset = Optional.ofNullable(properties.getProperty(AvailableSettings.HBM2DDL_CHARSET_NAME))
