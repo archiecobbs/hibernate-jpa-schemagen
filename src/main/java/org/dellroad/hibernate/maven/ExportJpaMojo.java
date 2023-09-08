@@ -5,19 +5,6 @@
 
 package org.dellroad.hibernate.maven;
 
-import org.apache.maven.artifact.DependencyResolutionRequiredException;
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugins.annotations.LifecyclePhase;
-import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.plugins.annotations.ResolutionScope;
-import org.hibernate.cfg.AvailableSettings;
-import org.hibernate.tool.api.metadata.MetadataDescriptor;
-import org.hibernate.tool.hbm2x.Exporter;
-import org.hibernate.tool.hbm2x.Hbm2DDLExporter;
-import org.hibernate.tool.internal.metadata.JpaMetadataDescriptor;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -30,6 +17,18 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Stream;
+
+import org.apache.maven.artifact.DependencyResolutionRequiredException;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.hibernate.cfg.AvailableSettings;
+import org.hibernate.tool.api.metadata.MetadataDescriptor;
+import org.hibernate.tool.hbm2x.Exporter;
+import org.hibernate.tool.hbm2x.Hbm2DDLExporter;
+import org.hibernate.tool.internal.metadata.JpaMetadataDescriptor;
 
 /**
  * Mojo that writes the DDL schema to an output file based on JPA meta-data,
