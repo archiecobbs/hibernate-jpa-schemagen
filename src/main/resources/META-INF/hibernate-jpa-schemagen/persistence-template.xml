@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="3.0" xmlns="https://jakarta.ee/xml/ns/persistence">
+    <persistence-unit name="@jpaName@">
+        <properties>
+            <property name="hibernate.dialect" value="@dialect@"/>
+        </properties>
+    </persistence-unit>
+</persistence>
