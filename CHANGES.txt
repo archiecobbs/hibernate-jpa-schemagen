@@ -1,5 +1,7 @@
-Version 5.6.2
+Version 5.6.2 Released September 13, 2023
 
+    - Add support for auto-generation of META-INF/persistence.xml.
+    - Fail build if verification file is non-empty and does not exist.
     - Delete the output file to ensure it actually gets (re)generated
 
 Version 5.6.1 Released September 4, 2023

@@ -7,8 +7,15 @@ package org.dellroad.hibernate.maven;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,45 +41,34 @@ import org.hibernate.tool.internal.metadata.JpaMetadataDescriptor;
  * Mojo that writes the DDL schema to an output file based on JPA meta-data,
  * without requiring a database connection.
  *
- * <p>
- * A {@code META-INF/persistence.xml} file is still required, even if this file is not used at runtime,
- * and it needs to exist under the same root as your compiled JPA classes (usually {@code target/classes}).
- * This file should at least include the {@code hibernate.dialect} property; it does <b>not</b>
- * need to specify a JDBC connection (although you can if you want). For example:
- *  <blockquote><code>
- *  &lt;?xml version="1.0" encoding="UTF-8"?&gt;
- *  &lt;persistence version="3.0" xmlns="https://jakarta.ee/xml/ns/persistence"&gt;
- *      &lt;persistence-unit name="myjpa"&gt;
- *          &lt;properties&gt;
- *              &lt;property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/&gt;
- *          &lt;/properties&gt;
- *      &lt;/persistence-unit&gt;
- *  &lt;/persistence&gt;
- *  </code></blockquote>
- * If you don't need {@code META-INF/persistence.xml} at runtime, set {@code removePersistenceXml} to true.
- *
- * <p>
- * Mojo also includes support for regex-based fixups and verification against an expected output.
- *
- * <p>
- * Note: you can safely ignore any "The application must supply JDBC connections" exceptions.
+ * @see <a href="https://github.com/archiecobbs/hibernate-jpa-schemagen">hibernate-jpa-schemagen</a>
  */
 @Mojo(name = "export-jpa-schema",
     requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME,
     defaultPhase = LifecyclePhase.PROCESS_CLASSES)
 public class ExportJpaMojo extends AbstractClasspathMojo {
 
+    private static final String GENERATED_JPA_UNIT_NAME = "generated";
+
     /** JPA persistence unit name. */
-    @Parameter
+    @Parameter(defaultValue = "")
     private String jpaUnit;
+
+    /** Hibernate SQL dialect class name. */
+    @Parameter(defaultValue = "")
+    private String dialect;
 
     /** Root directory where compiled classes and {@code META-INF/persistence.xml} can be found. */
     @Parameter(defaultValue = "${project.build.directory}/classes")
     private File classRoot;
 
     /** Whether to remove {@code META-INF/persistence.xml} when done. */
-    @Parameter(defaultValue = "false")
-    private boolean removePersistenceXml;
+    @Parameter(defaultValue = "")
+    private String removePersistenceXml;
+
+    /** Classpath resource for the {@code META-INF/persistence.xml} template. */
+    @Parameter(defaultValue = "META-INF/hibernate-jpa-schemagen/persistence-template.xml")
+    private String persistenceXmlTemplate;
 
     /** Optional properties file. Allows adding/overriding properties configured by the plugin. */
     @Parameter
@@ -85,14 +81,14 @@ public class ExportJpaMojo extends AbstractClasspathMojo {
     /** A file to compare the generated DDL script against for unexpected changes.
      *
      * <p>
-     * If the files don't match, the build fails. This can be used to signal that
+     * If the files don't match, or the file doesn't exist the build fails. This can be used to signal that
      * a schema migration is required (after which you can update the file).
      *
      * <p>
-     * If this file doesn't exist, no comparison is made.
+     * If this is set to empty string, no comparison is made.
      */
     @Parameter(defaultValue = "${project.basedir}/src/schema/schema.ddl")
-    private File verifyFile;
+    private String verifyFile;
 
     /**
      * Whether to include {@code DROP TABLE} statements.
@@ -136,9 +132,24 @@ public class ExportJpaMojo extends AbstractClasspathMojo {
     @Override
     protected void executeWithClasspath() throws MojoExecutionException {
 
-        // Sanity check
+        // Determine execution mode
+        final boolean hasJpaUnit = !this.nullOrEmpty(this.jpaUnit);
+        final boolean hasDialect = !this.nullOrEmpty(this.dialect);
+        if (hasJpaUnit != !hasDialect)
+            throw new MojoExecutionException("Exactly one of <jpaUnit> or <dialect> must be configured");
+
+        // Generate persistence.xml if needed
         final File metaInf = new File(this.classRoot, "META-INF");
         final File persistenceXml = new File(metaInf, "persistence.xml");
+        final boolean removePersistenceXmlBool;
+        if (hasDialect) {
+            removePersistenceXmlBool = this.nullOrEmpty(this.removePersistenceXml) || Boolean.valueOf(this.removePersistenceXml);
+            this.jpaUnit = GENERATED_JPA_UNIT_NAME;
+            this.generatePersistenceXml(persistenceXml);
+        } else
+            removePersistenceXmlBool = !this.nullOrEmpty(this.removePersistenceXml) && Boolean.valueOf(this.removePersistenceXml);
+
+        // Sanity check
         if (!persistenceXml.exists())
             throw new MojoExecutionException("No JPA persistence file found at location " + persistenceXml);
 
@@ -146,6 +157,7 @@ public class ExportJpaMojo extends AbstractClasspathMojo {
         final Properties properties = this.readProperties();
 
         // Create MetadataDescriptor
+        this.getLog().info("Gathering Hibernate meta-data");
         final MetadataDescriptor metadataDescriptor = this.createMetadataDescriptor(properties);
 
         // Create exporter
@@ -158,12 +170,13 @@ public class ExportJpaMojo extends AbstractClasspathMojo {
         this.outputFile.delete();
 
         // Run exporter
+        this.getLog().info("Invoking Hibernate exporter");
         exporter.start();
         this.getLog().info("Wrote generated schema to " + this.outputFile);
 
         // Clean up
-        if (this.removePersistenceXml) {
-            this.getLog().info("Removing " + persistenceXml);
+        if (removePersistenceXmlBool) {
+            this.getLog().info("Removing " + (hasDialect ? "generated" : "user-supplied") + " " + persistenceXml);
             persistenceXml.delete();
             metaInf.delete();           // ok if this fails, that means directory is not empty
         }
@@ -175,7 +188,32 @@ public class ExportJpaMojo extends AbstractClasspathMojo {
         this.verifyOutput();
     }
 
+    protected boolean nullOrEmpty(String s) {
+        return s == null || s.isEmpty();
+    }
+
 // Subclass Hooks
+
+    protected void generatePersistenceXml(File persistenceXml) throws MojoExecutionException {
+        this.getLog().info("Generating " + persistenceXml);
+        persistenceXml.getParentFile().mkdirs();
+        try (
+          Reader in = new InputStreamReader(Thread.currentThread().getContextClassLoader().getResourceAsStream(
+            this.persistenceXmlTemplate), StandardCharsets.UTF_8);
+          Writer out = new OutputStreamWriter(new FileOutputStream(persistenceXml), StandardCharsets.UTF_8)) {
+            final StringWriter buf = new StringWriter();
+            final char[] chunk = new char[256];
+            int r;
+            while ((r = in.read(chunk)) != -1)
+                buf.write(chunk, 0, r);
+            out.write(buf.toString()
+              .replaceAll("@jpaName@", this.jpaUnit)
+              .replaceAll("@dialect@", this.dialect));
+        } catch (IOException e) {
+            throw new MojoExecutionException("Error generating " + persistenceXml
+              + " from template " + this.persistenceXmlTemplate, e);
+        }
+    }
 
     protected MetadataDescriptor createMetadataDescriptor(Properties properties) {
         return new JpaMetadataDescriptor(this.jpaUnit, properties);
@@ -231,29 +269,32 @@ public class ExportJpaMojo extends AbstractClasspathMojo {
                     this.getLog().debug("Applying fixup #" + index + " to generated schema");
                     ddl = fixup.applyTo(ddl);
                 } catch (IllegalArgumentException e) {
-                    throw new MojoExecutionException("Error applying fixup #" + index + ": " + e.getMessage(), e);
+                    throw new MojoExecutionException("Error applying schema fixup #" + index + ": " + e.getMessage(), e);
                 }
                 index++;
             }
             Files.write(this.outputFile.toPath(), ddl.getBytes(charset));
         } catch (IOException e) {
-            throw new MojoExecutionException("Error applying fixups to " + this.outputFile + ": " + e.getMessage(), e);
+            throw new MojoExecutionException("Error applying schema fixups to " + this.outputFile + ": " + e.getMessage(), e);
         }
     }
 
     protected void verifyOutput() throws MojoExecutionException {
-        if (!this.verifyFile.exists()) {
-            this.getLog().info("Not verifying generated schema; " + this.verifyFile + " does not exist");
+        if (this.nullOrEmpty(this.verifyFile)) {
+            this.getLog().info("Not verifying generated schema (no verification file configured)");
             return;
         }
-        this.getLog().info("Comparing generated schema to " + this.verifyFile);
+        final File verifile = new File(this.verifyFile);
+        if (!verifile.exists())
+            throw new MojoExecutionException("Error verifying schema output: verification file " + verifile + " does not exist");
+        this.getLog().info("Comparing generated schema to " + verifile);
         try {
             final byte[] actual = Files.readAllBytes(this.outputFile.toPath());
-            final byte[] expected = Files.readAllBytes(this.verifyFile.toPath());
+            final byte[] expected = Files.readAllBytes(verifile.toPath());
             if (!Arrays.equals(actual, expected))
                 throw new MojoExecutionException("Generated schema differs from expected schema (schema migration may be needed)");
         } catch (IOException e) {
-            throw new MojoExecutionException("Error verifying output against " + this.verifyFile + ": " + e.getMessage(), e);
+            throw new MojoExecutionException("Error verifying schema output against " + verifile + ": " + e.getMessage(), e);
         }
         this.getLog().info("Schema verification succeeded");
     }
