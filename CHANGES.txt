@@ -10,7 +10,3 @@ Version 6.3.0 Released September 4, 2023
     - Add explicit validation-api dependency (missing from Hibernate)
     - Put dependencies on the classpath during execution
     - Add Maven enforcer to confirm the correct JDK version
- 
-Version 6.3.0
-
-    - Initial release
