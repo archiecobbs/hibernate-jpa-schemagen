@@ -61,12 +61,13 @@ Example configuration:
 Primary configuration options:
 * `<jpaUnit>` JPA persistence unit name (for user-supplied `META-INF/persistence.xml`).
 * `<dialect>` Hibernate dialect class (for plugin-generated `META-INF/persistence.xml`).
-* `<verifyFile>` Verification file, or empty string to not verify. Default `${project.basedir}/src/schema/schema.ddl`.
+* `<verifyFile>` Verification file, or `NONE` to not verify. Default `${project.basedir}/src/schema/schema.ddl`.
 * `<removePersistenceXml>` Whether to discard `META-INF/persistence.xml` when done.
+* `<fixups>` Apply arbitrary post-generation regular expression match/replace fixups.
 
 Other configuration options:
 * `<classRoot>` Directory where your entity classes and `META-INF/persistence.xml` are found. Default `${project.build.directory}/classes`.
-* `<outputFile>` Output file. Default `${project.build.directory}/generated-resources/schema.ddl`.
+* `<outputFile>` Output file, or `NONE` to discard output. Default `${project.build.directory}/generated-resources/schema.ddl`.
 * `<propertyFile>` Optional properties file. Overrides properties configured by the plugin.
 * `<persistenceXmlTemplate>` Classpath location for plugin-generated `META-INF/persistence.xml` template. Default `META-INF/hibernate-jpa-schemagen/persistence-template.xml`.
 * `<drop>` Include `DROP TABLE` statements. Default false.
