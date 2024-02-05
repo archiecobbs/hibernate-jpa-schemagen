@@ -1,3 +1,7 @@
+Version Next
+
+    - Allow either or both of <outputFile> or <verifyFile> to be "NONE".
+
 Version 5.3.2 Released September 13, 2023
 
     - Add support for auto-generation of META-INF/persistence.xml.
