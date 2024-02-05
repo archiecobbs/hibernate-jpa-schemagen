@@ -76,9 +76,15 @@ public class ExportJpaMojo extends AbstractClasspathMojo {
     @Parameter
     private File propertyFile;
 
-    /** The output file for the generated schema. */
+    /** The output file for the generated schema.
+     *
+     * <p>
+     * If this is set to empty string, a temporary file is used and then discarded.
+     */
     @Parameter(defaultValue = "${project.build.directory}/generated-resources/schema.ddl")
-    private File outputFile;
+    private String outputFile;
+
+    private File actualOutputFile;
 
     /** A file to compare the generated DDL script against for unexpected changes.
      *
@@ -155,6 +161,18 @@ public class ExportJpaMojo extends AbstractClasspathMojo {
         if (!persistenceXml.exists())
             throw new MojoExecutionException("No JPA persistence file found at location " + persistenceXml);
 
+        // Replace an empty output file with temporary file
+        final boolean discardOutput = this.nullOrEmptyOrNone(this.outputFile);
+        if (discardOutput) {
+            try {
+                this.actualOutputFile = File.createTempFile(this.getClass().getSimpleName(), ".sql");
+            } catch (IOException e) {
+                throw new MojoExecutionException("Error creating temporary file", e);
+            }
+            this.actualOutputFile.deleteOnExit();
+        } else
+            this.actualOutputFile = new File(this.outputFile);
+
         // Get properties
         final Properties properties = this.readProperties();
 
@@ -169,12 +187,12 @@ public class ExportJpaMojo extends AbstractClasspathMojo {
         this.configureExporter(exporter, properties, metadataDescriptor);
 
         // Delete the output file to ensure it actually gets (re)generated
-        this.outputFile.delete();
+        this.actualOutputFile.delete();
 
         // Run exporter
         this.getLog().info("Invoking Hibernate exporter");
         exporter.start();
-        this.getLog().info("Wrote generated schema to " + this.outputFile);
+        this.getLog().info("Wrote generated schema to " + this.actualOutputFile);
 
         // Clean up
         if (removePersistenceXmlBool) {
@@ -188,10 +206,18 @@ public class ExportJpaMojo extends AbstractClasspathMojo {
 
         // Verify result
         this.verifyOutput();
+
+        // Remove temporary file
+        if (discardOutput)
+            this.actualOutputFile.delete();
     }
 
     protected boolean nullOrEmpty(String s) {
         return s == null || s.isEmpty();
+    }
+
+    protected boolean nullOrEmptyOrNone(String s) {
+        return this.nullOrEmpty(s) || s.equals("NONE");
     }
 
 // Subclass Hooks
@@ -230,7 +256,7 @@ public class ExportJpaMojo extends AbstractClasspathMojo {
     protected void configureExporter(Exporter exporter, Properties properties, MetadataDescriptor metadataDescriptor) {
         exporter.getProperties().putAll(properties);
         exporter.getProperties().put(ExporterConstants.DESTINATION_FOLDER,
-          Optional.ofNullable(this.outputFile.getParentFile()).orElseGet(() -> new File(".")));
+          Optional.ofNullable(this.actualOutputFile.getParentFile()).orElseGet(() -> new File(".")));
         exporter.getProperties().put(ExporterConstants.METADATA_DESCRIPTOR, metadataDescriptor);
         exporter.getProperties().put(ExporterConstants.TEMPLATE_PATH, new String[0]);
         exporter.getProperties().put(ExporterConstants.EXPORT_TO_DATABASE, false);
@@ -240,7 +266,7 @@ public class ExportJpaMojo extends AbstractClasspathMojo {
         exporter.getProperties().put(ExporterConstants.DROP_DATABASE, this.drop);
         exporter.getProperties().put(ExporterConstants.CREATE_DATABASE, true);
         exporter.getProperties().put(ExporterConstants.FORMAT, this.format);
-        exporter.getProperties().put(ExporterConstants.OUTPUT_FILE_NAME, this.outputFile.getName());
+        exporter.getProperties().put(ExporterConstants.OUTPUT_FILE_NAME, this.actualOutputFile.getName());
         exporter.getProperties().put(ExporterConstants.HALT_ON_ERROR, true);
     }
 
@@ -260,11 +286,11 @@ public class ExportJpaMojo extends AbstractClasspathMojo {
     protected void applyFixups(Properties properties) throws MojoExecutionException {
         if (this.fixups.isEmpty())
             return;
-        this.getLog().info("Applying " + this.fixups.size() + " fixup(s) to " + this.outputFile);
+        this.getLog().info("Applying " + this.fixups.size() + " fixup(s) to " + this.actualOutputFile);
         try {
             final String charset = Optional.ofNullable(properties.getProperty(AvailableSettings.HBM2DDL_CHARSET_NAME))
               .orElse("utf-8");
-            String ddl = new String(Files.readAllBytes(this.outputFile.toPath()), charset);
+            String ddl = new String(Files.readAllBytes(this.actualOutputFile.toPath()), charset);
             int index = 1;
             for (Fixup fixup : this.fixups) {
                 try {
@@ -275,14 +301,14 @@ public class ExportJpaMojo extends AbstractClasspathMojo {
                 }
                 index++;
             }
-            Files.write(this.outputFile.toPath(), ddl.getBytes(charset));
+            Files.write(this.actualOutputFile.toPath(), ddl.getBytes(charset));
         } catch (IOException e) {
-            throw new MojoExecutionException("Error applying schema fixups to " + this.outputFile + ": " + e.getMessage(), e);
+            throw new MojoExecutionException("Error applying schema fixups to " + this.actualOutputFile + ": " + e.getMessage(), e);
         }
     }
 
     protected void verifyOutput() throws MojoExecutionException {
-        if (this.nullOrEmpty(this.verifyFile)) {
+        if (this.nullOrEmptyOrNone(this.verifyFile)) {
             this.getLog().info("Not verifying generated schema (no verification file configured)");
             return;
         }
@@ -291,7 +317,7 @@ public class ExportJpaMojo extends AbstractClasspathMojo {
             throw new MojoExecutionException("Error verifying schema output: verification file " + verifile + " does not exist");
         this.getLog().info("Comparing generated schema to " + verifile);
         try {
-            final byte[] actual = Files.readAllBytes(this.outputFile.toPath());
+            final byte[] actual = Files.readAllBytes(this.actualOutputFile.toPath());
             final byte[] expected = Files.readAllBytes(verifile.toPath());
             if (!Arrays.equals(actual, expected))
                 throw new MojoExecutionException("Generated schema differs from expected schema (schema migration may be needed)");
