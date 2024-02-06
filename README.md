@@ -62,7 +62,7 @@ Primary configuration options:
 * `<jpaUnit>` JPA persistence unit name (for user-supplied `META-INF/persistence.xml`).
 * `<dialect>` Hibernate dialect class (for plugin-generated `META-INF/persistence.xml`).
 * `<verifyFile>` Verification file, or `NONE` to not verify. Default `${project.basedir}/src/schema/schema.ddl`.
-* `<removePersistenceXml>` Whether to discard `META-INF/persistence.xml` when done.
+* `<removePersistenceXml>` Whether to discard `META-INF/persistence.xml` when done. See below for default.
 * `<fixups>` Apply arbitrary post-generation regular expression match/replace fixups.
 
 Other configuration options:
