@@ -112,7 +112,7 @@ If you don't have a `META-INF/persistence.xml`, then the plugin can generate a t
 When letting the plugin generate `META-INF/persistence.xml` for you:
 
 * `<dialect>` is required
-* `<jpaUnit>` is not allowed
+* `<jpaUnit>` is not allowed (the unit name will be `generated`)
 * `<removePersistenceXml>` defaults to `true`
 
 You can override the template used to generate the file using `<persistenceXmlTemplate>`. When doing this, you should put your template on the plugin's classpath by adding an appropriate `<dependency>`. The template is assumed to be UTF-8 encoded.
