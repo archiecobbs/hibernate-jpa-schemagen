@@ -1,6 +1,7 @@
-Version Next
+Version 6.2.3 Released June 22, 2024
 
     - Allow either or both of <outputFile> or <verifyFile> to be "NONE".
+    - Update to Hibernate 6.2.25.Final.
 
 Version 6.2.2 Released September 13, 2023
 
