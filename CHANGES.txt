@@ -1,4 +1,4 @@
-Version Next
+Version 6.5.0 Released June 22, 2024
 
     - Update to Hibernate 6.5.2.Final.
 
