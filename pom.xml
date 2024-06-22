@@ -7,7 +7,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.dellroad</groupId>
     <artifactId>hibernate-jpa-schemagen</artifactId>
-    <version>5.6.2</version>
+    <version>5.6.3</version>
     <name>Hibernate+JPA Schema Generator</name>
     <packaging>maven-plugin</packaging>
     <description>Sensible Maven schema DDL generator for projects using Hibernate and JPA</description>
