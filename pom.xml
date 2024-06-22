@@ -18,14 +18,14 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <hibernate.version>5.3.36.Final</hibernate.version>
-        <slf4j.version>2.0.9</slf4j.version>
+        <slf4j.version>2.0.13</slf4j.version>
         <validation-api.version>2.0.1.Final</validation-api.version>
 
         <extra.enforcer.rules.version>1.5.1</extra.enforcer.rules.version>
         <maven.artifact.version>3.9.4</maven.artifact.version>
         <maven.checkstyle.plugin.version>3.0.0</maven.checkstyle.plugin.version>
-        <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
-        <maven.enforcer.plugin.version>3.4.0</maven.enforcer.plugin.version>
+        <maven.compiler.plugin.version>3.13.0</maven.compiler.plugin.version>
+        <maven.enforcer.plugin.version>3.4.1</maven.enforcer.plugin.version>
         <maven.gpg.plugin.version>3.1.0</maven.gpg.plugin.version>
         <maven.plugin-api.version>3.9.4</maven.plugin-api.version>
         <maven.plugin.tools.version>3.9.0</maven.plugin.tools.version>
