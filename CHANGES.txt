@@ -1,7 +1,7 @@
 Version 5.6.3 Released June 22, 2024
 
     - Allow either or both of <outputFile> or <verifyFile> to be "NONE".
-    - Update to Hibernate 6.4.9.Final.
+    - Update to Hibernate 5.6.15.Final.
 
 Version 5.6.2 Released September 13, 2023
 
