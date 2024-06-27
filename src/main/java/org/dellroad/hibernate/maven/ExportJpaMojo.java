@@ -291,18 +291,43 @@ public class ExportJpaMojo extends AbstractClasspathMojo {
             final String charset = Optional.ofNullable(properties.getProperty(AvailableSettings.HBM2DDL_CHARSET_NAME))
               .orElse("utf-8");
             String ddl = new String(Files.readAllBytes(this.actualOutputFile.toPath()), charset);
-            int index = 1;
-            for (Fixup fixup : this.fixups) {
-                try {
-                    this.getLog().debug(String.format("Applying fixup #%d to generated schema", index));
-                    ddl = fixup.applyTo(ddl);
-                } catch (IllegalArgumentException e) {
-                    throw new MojoExecutionException(String.format(
-                      "Error applying schema fixup #%d: %s", index, e.getMessage()), e);
+            boolean completedAllFixups = false;
+            try {
+                int index = 1;
+                for (Fixup fixup : this.fixups) {
+                    if (this.getLog().isDebugEnabled()) {
+                        this.getLog().debug(String.format("Applying fixup #%d to generated schema...", index));
+                        this.getLog().debug(String.format("  pattern: \"%s\"", fixup.pattern));
+                        this.getLog().debug(String.format("  replace: \"%s\"", Optional.ofNullable(fixup.replacement).orElse("")));
+                    }
+                    final String ddl2;
+                    try {
+                        ddl2 = fixup.applyTo(index, ddl);
+                    } catch (IllegalArgumentException e) {
+                        throw new MojoExecutionException(String.format("Error applying fixup #%d: %s", index, e.getMessage()), e);
+                    }
+                    if (!ddl2.equals(ddl)) {
+                        if (this.getLog().isDebugEnabled()) {
+                            this.getLog().debug(String.format(
+                              "Fixup #%d resulted in schema modification (old length %d, new length %d)",
+                              index, ddl.length(), ddl2.length()));
+                        }
+                        ddl = ddl2;
+                    } else {
+                        if (this.getLog().isDebugEnabled())
+                            this.getLog().debug(String.format("Fixup #%d resulted in no schema modification", index));
+                    }
+                    index++;
                 }
-                index++;
+                completedAllFixups = true;
+            } finally {     // even if a fixup fails, leave the output file as it was just prior to that fixup
+                try {
+                    Files.write(this.actualOutputFile.toPath(), ddl.getBytes(charset));
+                } catch (IOException e) {
+                    if (completedAllFixups)
+                        throw e;
+                }
             }
-            Files.write(this.actualOutputFile.toPath(), ddl.getBytes(charset));
         } catch (IOException e) {
             throw new MojoExecutionException(String.format(
               "Error applying schema fixups to %s: %s", this.actualOutputFile, e.getMessage()), e);
