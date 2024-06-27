@@ -299,6 +299,7 @@ public class ExportJpaMojo extends AbstractClasspathMojo {
                         this.getLog().debug(String.format("Applying fixup #%d to generated schema...", index));
                         this.getLog().debug(String.format("  pattern: \"%s\"", fixup.pattern));
                         this.getLog().debug(String.format("  replace: \"%s\"", Optional.ofNullable(fixup.replacement).orElse("")));
+                        this.getLog().debug(String.format(" required: %s", fixup.modificationRequired));
                     }
                     final String ddl2;
                     try {
@@ -316,6 +317,10 @@ public class ExportJpaMojo extends AbstractClasspathMojo {
                     } else {
                         if (this.getLog().isDebugEnabled())
                             this.getLog().debug(String.format("Fixup #%d resulted in no schema modification", index));
+                        if (fixup.modificationRequired) {
+                            throw new MojoExecutionException(String.format(
+                              "Fixup #%d is required to modify the schema but no modification occurred", index));
+                        }
                     }
                     index++;
                 }

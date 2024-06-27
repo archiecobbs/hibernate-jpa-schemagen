@@ -30,6 +30,12 @@ public class Fixup {
     @Parameter(required = true)
     String replacement;
 
+    /**
+     * Whether this fixup must always result in a modification to the schema.
+     */
+    @Parameter(defaultValue = "false")
+    boolean modificationRequired;
+
     public String applyTo(int index, String input) {
         if (this.pattern == null)
             throw new IllegalArgumentException("no pattern specified");

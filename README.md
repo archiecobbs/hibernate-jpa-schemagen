@@ -47,6 +47,7 @@ Example configuration:
                     <fixup>
                         <pattern>InnoDB;</pattern>
                         <replacement>InnoDB default charset=utf8mb4 collate=utf8mb4_bin;</replacement>
+                        <modificationRequired>true</modificationRequired>
                     </fixup>
                 </fixups>
             </configuration>
@@ -68,6 +69,7 @@ Primary configuration options:
 Regarding `<fixups>`:
 * The `<pattern>` is a Java regular expression suitable for `Pattern.compile()`.
 * The `<replacement>` is a Java regular expression replacement string suitable for `Matcher.replaceAll()`.
+* The `<modificationRequired>` element is optional and defaults to false. If set to true, the build will fail if the fixup results in no change to the generated schema (either because the pattern failed to match, or because it always replaced with the same substring).
 
 **Warning**: By default, Maven trims whitespace in configuration properties; add`xml:space="preserve"` to disable this behavior. For example, to change all lines that are indented by two spaces to instead be indented by four spaces, you could do this:
 ```xml
