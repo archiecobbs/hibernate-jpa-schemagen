@@ -19,7 +19,7 @@ public class Fixup {
      * This must be a valid regular expression suitable as a {@link Pattern}.
      */
     @Parameter(required = true)
-    private String pattern;
+    String pattern;
 
     /**
      * The replacement expression to apply to all matches found.
@@ -28,9 +28,15 @@ public class Fixup {
      * This must be a valid regular expression replacement string suitable for {@code Matcher.replaceAll()}.
      */
     @Parameter(required = true)
-    private String replacement;
+    String replacement;
 
-    public String applyTo(String string) {
+    /**
+     * Whether this fixup must always result in a modification to the schema.
+     */
+    @Parameter(defaultValue = "false")
+    boolean modificationRequired;
+
+    public String applyTo(int index, String input) {
         if (this.pattern == null)
             throw new IllegalArgumentException("no pattern specified");
         // Note: Maven passes empty strings as nulls, so map them here
@@ -39,8 +45,8 @@ public class Fixup {
         try {
             regex = Pattern.compile(this.pattern);
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("invalid regular expression: " + e.getMessage(), e);
+            throw new IllegalArgumentException(String.format("Invalid regular expression: %s", e.getMessage()), e);
         }
-        return regex.matcher(string).replaceAll(replace);
+        return regex.matcher(input).replaceAll(replace);
     }
 }
