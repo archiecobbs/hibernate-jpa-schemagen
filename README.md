@@ -65,6 +65,18 @@ Primary configuration options:
 * `<removePersistenceXml>` Whether to discard `META-INF/persistence.xml` when done. See below for default.
 * `<fixups>` Apply arbitrary post-generation regular expression match/replace fixups.
 
+Regarding `<fixups>`:
+* The `<pattern>` is a Java regular expression suitable for `Pattern.compile()`.
+* The `<replacement>` is a Java regular expression replacement string suitable for `Matcher.replaceAll()`.
+
+**Warning**: By default, Maven trims whitespace in configuration properties; add`xml:space="preserve"` to disable this behavior. For example, to change all lines that are indented by two spaces to instead be indented by four spaces, you could do this:
+```xml
+<fixup>
+    <pattern>(?m)^  (?!\s)</pattern>
+    <replacement xml:space="preserve">    </replacement>
+</fixup>
+```
+
 Other configuration options:
 * `<classRoot>` Directory where your entity classes and `META-INF/persistence.xml` are found. Default `${project.build.directory}/classes`.
 * `<outputFile>` Output file, or `NONE` to discard output. Default `${project.build.directory}/generated-resources/schema.ddl`.
