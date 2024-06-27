@@ -190,11 +190,11 @@ public class ExportJpaMojo extends AbstractClasspathMojo {
         // Run exporter
         this.getLog().info("Invoking Hibernate exporter");
         exporter.start();
-        this.getLog().info("Wrote generated schema to " + this.actualOutputFile);
+        this.getLog().info(String.format("Wrote generated schema to %s", this.actualOutputFile));
 
         // Clean up
         if (removePersistenceXmlBool) {
-            this.getLog().info("Removing " + (hasDialect ? "generated" : "user-supplied") + " " + persistenceXml);
+            this.getLog().info(String.format("Removing %s %s", hasDialect ? "generated" : "user-supplied", persistenceXml));
             persistenceXml.delete();
             metaInf.delete();           // ok if this fails, that means directory is not empty
         }
@@ -221,7 +221,7 @@ public class ExportJpaMojo extends AbstractClasspathMojo {
 // Subclass Hooks
 
     protected void generatePersistenceXml(File persistenceXml) throws MojoExecutionException {
-        this.getLog().info("Generating " + persistenceXml);
+        this.getLog().info(String.format("Generating %s", persistenceXml));
         persistenceXml.getParentFile().mkdirs();
         try (
           Reader in = new InputStreamReader(Thread.currentThread().getContextClassLoader().getResourceAsStream(
@@ -236,8 +236,8 @@ public class ExportJpaMojo extends AbstractClasspathMojo {
               .replaceAll("@jpaName@", this.jpaUnit)
               .replaceAll("@dialect@", this.dialect));
         } catch (IOException e) {
-            throw new MojoExecutionException("Error generating " + persistenceXml
-              + " from template " + this.persistenceXmlTemplate, e);
+            throw new MojoExecutionException(String.format(
+              "Error generating %s from template %s", persistenceXml, this.persistenceXmlTemplate), e);
         }
     }
 
@@ -271,11 +271,11 @@ public class ExportJpaMojo extends AbstractClasspathMojo {
     protected Properties readProperties() throws MojoExecutionException {
         final Properties properties = new Properties();
         if (this.propertyFile != null) {
-            this.getLog().debug("Loading schema generation properties from " + this.propertyFile);
+            this.getLog().debug(String.format("Loading schema generation properties from %s", this.propertyFile));
             try (FileInputStream input = new FileInputStream(this.propertyFile)) {
                 properties.load(input);
             } catch (IOException e) {
-                throw new MojoExecutionException("Error loading " + this.propertyFile + ": " + e.getMessage(), e);
+                throw new MojoExecutionException(String.format("Error loading %s: %s", this.propertyFile, e.getMessage()), e);
             }
         }
         return properties;
@@ -284,24 +284,56 @@ public class ExportJpaMojo extends AbstractClasspathMojo {
     protected void applyFixups(Properties properties) throws MojoExecutionException {
         if (this.fixups.isEmpty())
             return;
-        this.getLog().info("Applying " + this.fixups.size() + " fixup(s) to " + this.actualOutputFile);
+        this.getLog().info(String.format("Applying %d fixup(s) to %s", this.fixups.size(), this.actualOutputFile));
         try {
             final String charset = Optional.ofNullable(properties.getProperty(AvailableSettings.HBM2DDL_CHARSET_NAME))
               .orElse("utf-8");
             String ddl = new String(Files.readAllBytes(this.actualOutputFile.toPath()), charset);
-            int index = 1;
-            for (Fixup fixup : this.fixups) {
-                try {
-                    this.getLog().debug("Applying fixup #" + index + " to generated schema");
-                    ddl = fixup.applyTo(ddl);
-                } catch (IllegalArgumentException e) {
-                    throw new MojoExecutionException("Error applying schema fixup #" + index + ": " + e.getMessage(), e);
+            boolean completedAllFixups = false;
+            try {
+                int index = 1;
+                for (Fixup fixup : this.fixups) {
+                    if (this.getLog().isDebugEnabled()) {
+                        this.getLog().debug(String.format("Applying fixup #%d to generated schema...", index));
+                        this.getLog().debug(String.format("  pattern: \"%s\"", fixup.pattern));
+                        this.getLog().debug(String.format("  replace: \"%s\"", Optional.ofNullable(fixup.replacement).orElse("")));
+                        this.getLog().debug(String.format(" required: %s", fixup.modificationRequired));
+                    }
+                    final String ddl2;
+                    try {
+                        ddl2 = fixup.applyTo(index, ddl);
+                    } catch (IllegalArgumentException e) {
+                        throw new MojoExecutionException(String.format("Error applying fixup #%d: %s", index, e.getMessage()), e);
+                    }
+                    if (!ddl2.equals(ddl)) {
+                        if (this.getLog().isDebugEnabled()) {
+                            this.getLog().debug(String.format(
+                              "Fixup #%d resulted in schema modification (old length %d, new length %d)",
+                              index, ddl.length(), ddl2.length()));
+                        }
+                        ddl = ddl2;
+                    } else {
+                        if (this.getLog().isDebugEnabled())
+                            this.getLog().debug(String.format("Fixup #%d resulted in no schema modification", index));
+                        if (fixup.modificationRequired) {
+                            throw new MojoExecutionException(String.format(
+                              "Fixup #%d is required to modify the schema but no modification occurred", index));
+                        }
+                    }
+                    index++;
                 }
-                index++;
+                completedAllFixups = true;
+            } finally {     // even if a fixup fails, leave the output file as it was just prior to that fixup
+                try {
+                    Files.write(this.actualOutputFile.toPath(), ddl.getBytes(charset));
+                } catch (IOException e) {
+                    if (completedAllFixups)
+                        throw e;
+                }
             }
-            Files.write(this.actualOutputFile.toPath(), ddl.getBytes(charset));
         } catch (IOException e) {
-            throw new MojoExecutionException("Error applying schema fixups to " + this.actualOutputFile + ": " + e.getMessage(), e);
+            throw new MojoExecutionException(String.format(
+              "Error applying schema fixups to %s: %s", this.actualOutputFile, e.getMessage()), e);
         }
     }
 
@@ -311,16 +343,19 @@ public class ExportJpaMojo extends AbstractClasspathMojo {
             return;
         }
         final File verifile = new File(this.verifyFile);
-        if (!verifile.exists())
-            throw new MojoExecutionException("Error verifying schema output: verification file " + verifile + " does not exist");
-        this.getLog().info("Comparing generated schema to " + verifile);
+        if (!verifile.exists()) {
+            throw new MojoExecutionException(String.format(
+              "Error verifying schema output: verification file %s does not exist", verifile));
+        }
+        this.getLog().info(String.format("Comparing generated schema to %s", verifile));
         try {
             final byte[] actual = Files.readAllBytes(this.actualOutputFile.toPath());
             final byte[] expected = Files.readAllBytes(verifile.toPath());
             if (!Arrays.equals(actual, expected))
                 throw new MojoExecutionException("Generated schema differs from expected schema (schema migration may be needed)");
         } catch (IOException e) {
-            throw new MojoExecutionException("Error verifying schema output against " + verifile + ": " + e.getMessage(), e);
+            throw new MojoExecutionException(String.format(
+              "Error verifying schema output against %s: %s", verifile, e.getMessage()), e);
         }
         this.getLog().info("Schema verification succeeded");
     }
