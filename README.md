@@ -71,7 +71,7 @@ Regarding `<fixups>`:
 * The `<replacement>` is a Java regular expression replacement string suitable for `Matcher.replaceAll()`.
 * The `<modificationRequired>` element is optional and defaults to false. If set to true, the build will fail if the fixup results in no change to the generated schema (either because the pattern failed to match, or because it always replaced with the same substring).
 
-**Warning**: By default, Maven trims whitespace in configuration properties; add`xml:space="preserve"` to disable this behavior. For example, to change all lines that are indented by two spaces to instead be indented by four spaces, you could do this:
+**Warning**: By default, Maven trims whitespace in configuration properties; add `xml:space="preserve"` to disable this behavior. For example, to change all lines that are indented by two spaces to instead be indented by four spaces, you could do this:
 ```xml
 <fixup>
     <pattern>(?m)^  (?!\s)</pattern>
