@@ -39,7 +39,7 @@ public class Fixup {
         try {
             regex = Pattern.compile(this.pattern);
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("invalid regular expression: " + e.getMessage(), e);
+            throw new IllegalArgumentException(String.format("Invalid regular expression: %s", e.getMessage()), e);
         }
         return regex.matcher(string).replaceAll(replace);
     }
