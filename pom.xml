@@ -21,6 +21,7 @@
         <slf4j.version>2.0.13</slf4j.version>
         <validation-api.version>2.0.1.Final</validation-api.version>
 
+        <central-publishing-maven-plugin.version>0.7.0</central-publishing-maven-plugin.version>
         <extra.enforcer.rules.version>1.5.1</extra.enforcer.rules.version>
         <maven.artifact.version>3.9.4</maven.artifact.version>
         <maven.checkstyle.plugin.version>3.0.0</maven.checkstyle.plugin.version>
@@ -57,14 +58,6 @@
     </developers>
     <distributionManagement>
         <downloadUrl>https://github.com/archiecobbs/hibernate-jpa-schemagen</downloadUrl>
-        <snapshotRepository>
-            <id>sonatype-nexus-snapshots</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <repository>
-            <id>sonatype-nexus-staging</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
         <site>
             <id>${project.artifactId}-site</id>
             <url>https://github.com/archiecobbs/hibernate-jpa-schemagen/</url>
@@ -235,6 +228,18 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+
+            <!-- Deployment -->
+            <plugin>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <version>${central-publishing-maven-plugin.version}</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <publishingServerId>central</publishingServerId>
+                    <autoPublish>true</autoPublish>
+                </configuration>
             </plugin>
         </plugins>
     </build>
