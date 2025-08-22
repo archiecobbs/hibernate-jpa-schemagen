@@ -1,7 +1,9 @@
-Version Next
+Version 7.1.0 Released August 22, 2025
 
     - Add config knobs for <globallyQuotedIdentifiers> and
       <globallyQuotedIdentifiersSkipColumnDefinitions> (pr#2).
+    - Update to Hibernate 7.1.0.Final.
+    - Update to JDK 17.
 
 Version 6.5.1 Released June 22, 2024
 

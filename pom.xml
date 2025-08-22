@@ -7,19 +7,19 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.dellroad</groupId>
     <artifactId>hibernate-jpa-schemagen</artifactId>
-    <version>6.5.1</version>
+    <version>7.1.0</version>
     <name>Hibernate+JPA Schema Generator</name>
     <packaging>maven-plugin</packaging>
     <description>Sensible Maven schema DDL generator for projects using Hibernate and JPA</description>
     <url>https://github.com/archiecobbs/hibernate-jpa-schemagen/</url>
 
     <properties>
-        <java.version>11</java.version>
+        <java.version>17</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <hibernate.version>6.5.2.Final</hibernate.version>
+        <hibernate.version>7.1.0.Final</hibernate.version>
         <slf4j.version>2.0.13</slf4j.version>
-        <validation-api.version>3.0.2</validation-api.version>
+        <validation-api.version>3.1.1</validation-api.version>
 
         <central-publishing-maven-plugin.version>0.7.0</central-publishing-maven-plugin.version>
         <extra.enforcer.rules.version>1.5.1</extra.enforcer.rules.version>
@@ -183,7 +183,7 @@
                         <configuration>
                             <rules>
                                 <requireJavaVersion>
-                                    <version>[11,12)</version>
+                                    <version>[17,18)</version>
                                 </requireJavaVersion>
                                 <enforceBytecodeVersion>
                                     <maxJdkVersion>${java.version}</maxJdkVersion>
