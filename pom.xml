@@ -7,7 +7,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.dellroad</groupId>
     <artifactId>hibernate-jpa-schemagen</artifactId>
-    <version>6.4.1</version>
+    <version>6.4.2</version>
     <name>Hibernate+JPA Schema Generator</name>
     <packaging>maven-plugin</packaging>
     <description>Sensible Maven schema DDL generator for projects using Hibernate and JPA</description>
@@ -17,20 +17,22 @@
         <java.version>11</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <hibernate.version>6.4.9.Final</hibernate.version>
+        <hibernate.version>6.4.10.Final</hibernate.version>
         <slf4j.version>2.0.13</slf4j.version>
         <validation-api.version>3.0.2</validation-api.version>
 
         <central-publishing-maven-plugin.version>0.7.0</central-publishing-maven-plugin.version>
         <extra.enforcer.rules.version>1.5.1</extra.enforcer.rules.version>
         <maven.artifact.version>3.9.4</maven.artifact.version>
-        <maven.checkstyle.plugin.version>3.0.0</maven.checkstyle.plugin.version>
-        <maven.compiler.plugin.version>3.13.0</maven.compiler.plugin.version>
-        <maven.enforcer.plugin.version>3.4.1</maven.enforcer.plugin.version>
-        <maven.gpg.plugin.version>3.1.0</maven.gpg.plugin.version>
-        <maven.plugin-api.version>3.9.4</maven.plugin-api.version>
-        <maven.plugin.tools.version>3.9.0</maven.plugin.tools.version>
-        <maven.project.version>3.0-alpha-2</maven.project.version>
+        <maven-checkstyle-plugin.version>3.0.0</maven-checkstyle-plugin.version>
+        <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
+        <maven-enforcer-plugin.version>3.4.1</maven-enforcer-plugin.version>
+        <maven-javadoc-plugin.version>3.11.3</maven-javadoc-plugin.version>
+        <maven-gpg-plugin.version>3.1.0</maven-gpg-plugin.version>
+        <maven-plugin-api.version>3.9.4</maven-plugin-api.version>
+        <maven-plugin-tools.version>3.9.0</maven-plugin-tools.version>
+        <maven-project.version>3.0-alpha-2</maven-project.version>
+        <maven-source-plugin.version>3.3.1</maven-source-plugin.version>
     </properties>
 
     <licenses>
@@ -109,13 +111,13 @@
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-plugin-api</artifactId>
-            <version>${maven.plugin-api.version}</version>
+            <version>${maven-plugin-api.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-project</artifactId>
-            <version>${maven.project.version}</version>
+            <version>${maven-project.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -127,7 +129,7 @@
         <dependency>
             <groupId>org.apache.maven.plugin-tools</groupId>
             <artifactId>maven-plugin-annotations</artifactId>
-            <version>${maven.plugin.tools.version}</version>
+            <version>${maven-plugin-tools.version}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
@@ -138,7 +140,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven.compiler.plugin.version}</version>
+                <version>${maven-compiler-plugin.version}</version>
                 <configuration>
                     <release>${java.version}</release>
                 </configuration>
@@ -146,7 +148,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-plugin-plugin</artifactId>
-                <version>${maven.plugin.tools.version}</version>
+                <version>${maven-plugin-tools.version}</version>
                 <executions>
                     <execution>
                         <id>default-descriptor</id>
@@ -165,7 +167,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>${maven.enforcer.plugin.version}</version>
+                <version>${maven-enforcer-plugin.version}</version>
                 <dependencies>
                     <dependency>
                         <groupId>org.codehaus.mojo</groupId>
@@ -198,7 +200,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>${maven.checkstyle.plugin.version}</version>
+                <version>${maven-checkstyle-plugin.version}</version>
                 <executions>
                     <execution>
                         <id>checkstyle_verify</id>
@@ -218,6 +220,42 @@
                         </configuration>
                         <goals>
                             <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Sources -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>${maven-source-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Javadoc -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${maven-javadoc-plugin.version}</version>
+                <configuration>
+                    <notimestamp>true</notimestamp>
+                    <validateLinks>true</validateLinks>
+                    <doclint>-missing</doclint>
+                    <links/>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -246,7 +284,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>${maven.gpg.plugin.version}</version>
+                        <version>${maven-gpg-plugin.version}</version>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>
