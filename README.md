@@ -84,9 +84,11 @@ Other configuration options:
 * `<outputFile>` Output file, or `NONE` to discard output. Default `${project.build.directory}/generated-resources/schema.ddl`.
 * `<propertyFile>` Optional properties file. Overrides properties configured by the plugin.
 * `<persistenceXmlTemplate>` Classpath location for plugin-generated `META-INF/persistence.xml` template. Default `META-INF/hibernate-jpa-schemagen/persistence-template.xml`.
-* `<drop>` Include `DROP TABLE` statements. Default false.
+* `<drop>` Include `DROP TABLE` statements. Default `false`.
 * `<delimiter>` The delimiter that separates SQL statements. Default `;`.
-* `<format>` Whether to format SQL statements. Default true.
+* `<format>` Whether to format SQL statements. Default `true`.
+* `<globallyQuotedIdentifiers>` Whether to quote all identifiers with dialect specific character. Correlated with `org.hibernate.cfg.MappingSettings#GLOBALLY_QUOTED_IDENTIFIERS`. Default `false`.
+* `<globallyQuotedIdentifiersSkipColumnDefinitions>` Whether to quote all identifiers but skip column definitions. Correlated with `org.hibernate.cfg.MappingSettings#GLOBALLY_QUOTED_IDENTIFIERS_SKIP_COLUMN_DEFINITIONS`. Default `false`.
 
 By default, the plugin runs in the `process-classes` Maven lifecycle phase.
 
