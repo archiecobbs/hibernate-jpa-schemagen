@@ -1,4 +1,4 @@
-Version Next
+Version 5.6.4 Released August 22, 2025
 
     - Add config knobs for <globallyQuotedIdentifiers> and
       <globallyQuotedIdentifiersSkipColumnDefinitions> (pr#2).
