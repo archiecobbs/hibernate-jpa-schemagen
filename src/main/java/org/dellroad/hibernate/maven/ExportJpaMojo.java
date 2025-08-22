@@ -117,6 +117,18 @@ public class ExportJpaMojo extends AbstractClasspathMojo {
     private boolean format;
 
     /**
+     * {@link org.hibernate.cfg.MappingSettings#GLOBALLY_QUOTED_IDENTIFIERS}
+     */
+    @Parameter(defaultValue = "false")
+    private boolean globallyQuotedIdentifiers;
+
+    /**
+     * {@link org.hibernate.cfg.MappingSettings#GLOBALLY_QUOTED_IDENTIFIERS_SKIP_COLUMN_DEFINITIONS}
+     */
+    @Parameter(defaultValue = "false")
+    private boolean globallyQuotedIdentifiersSkipColumnDefinitions;
+
+    /**
      * Match/replace "fixups" to apply to the generated schema.
      */
     @Parameter
@@ -175,6 +187,9 @@ public class ExportJpaMojo extends AbstractClasspathMojo {
 
         // Get properties
         final Properties properties = this.readProperties();
+        properties.put(AvailableSettings.GLOBALLY_QUOTED_IDENTIFIERS, this.globallyQuotedIdentifiers);
+        properties.put(AvailableSettings.GLOBALLY_QUOTED_IDENTIFIERS_SKIP_COLUMN_DEFINITIONS,
+                this.globallyQuotedIdentifiersSkipColumnDefinitions);
 
         // Create MetadataDescriptor
         this.getLog().info("Gathering Hibernate meta-data");
