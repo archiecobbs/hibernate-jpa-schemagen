@@ -7,7 +7,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.dellroad</groupId>
     <artifactId>hibernate-jpa-schemagen</artifactId>
-    <version>7.1.0</version>
+    <version>7.1.1</version>
     <name>Hibernate+JPA Schema Generator</name>
     <packaging>maven-plugin</packaging>
     <description>Sensible Maven schema DDL generator for projects using Hibernate and JPA</description>
@@ -18,6 +18,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <hibernate.version>7.1.0.Final</hibernate.version>
+        <jakarta-el.version>4.0.2</jakarta-el.version>
         <slf4j.version>2.0.13</slf4j.version>
         <validation-api.version>3.1.1</validation-api.version>
 
@@ -93,6 +94,13 @@
             <groupId>jakarta.validation</groupId>
             <artifactId>jakarta.validation-api</artifactId>
             <version>${validation-api.version}</version>
+        </dependency>
+
+        <!-- Required to fix "HV000183: Unable to initialize 'jakarta.el.ExpressionFactory' -->
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>jakarta.el</artifactId>
+            <version>${jakarta-el.version}</version>
         </dependency>
 
         <!-- Logging -->

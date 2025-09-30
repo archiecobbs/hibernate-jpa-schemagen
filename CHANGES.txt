@@ -1,3 +1,7 @@
+Version 7.1.1
+
+    - Add dependency on org.glassfish:jakarta.el.
+
 Version 7.1.0 Released August 22, 2025
 
     - Add config knobs for <globallyQuotedIdentifiers> and
