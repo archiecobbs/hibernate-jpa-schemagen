@@ -1,4 +1,4 @@
-Version 7.1.1
+Version 7.1.1 Released April 8, 2026
 
     - Add dependency on org.glassfish:jakarta.el.
 
