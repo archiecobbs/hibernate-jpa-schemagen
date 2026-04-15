@@ -28,6 +28,8 @@ What this Maven plugin does:
 
 ### Configuring the Plugin
 
+Note: For versions 7.2.1 and later, the artifact name of this plugin is `hibernate-jpa-schemagen-maven-plugin`; for earlier versions, use `hibernate-jpa-schemagen`.
+
 Each version of this plugin has a version number that matches the version of Hibernate against which it was compiled in the major and minor components (i.e., first two numbers), so for example for Hibernate version `6.4.1.Final` you should use the latest 6.4.x version of this plugin.
 
 Example configuration:

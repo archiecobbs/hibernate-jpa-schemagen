@@ -68,13 +68,6 @@
         <property name="ignorePattern" value="(^import)|(^ *\*)"/>
     </module>
 
-    <!-- https://checkstyle.sourceforge.io/filters/suppresswithplaintextcommentfilter.html -->
-    <module name="SuppressWithPlainTextCommentFilter">
-        <property name="offCommentFormat" value="CHECKSTYLE OFF\: ([\w\|]+)"/>
-        <property name="onCommentFormat" value="CHECKSTYLE ON\: ([\w\|]+)"/>
-        <property name="checkFormat" value="$1"/>
-    </module>
-
     <module name="TreeWalker">
 
         <module name="SuppressionCommentFilter">
@@ -130,11 +123,9 @@
         <module name="RedundantImport"/>
         <module name="UnusedImports"/>
         <module name="ImportOrder">
-            <property name="groups" value="au,bsh,ca,com,de,info,io,jakarta,java,javax,jdk,jetbrains,joptsimple,junit,net,org"/>
+            <property name="groups" value="au,bsh,ca,com,info,io,jakarta,java,javax,jdk,jetbrains,joptsimple,junit,net,org"/>
             <property name="ordered" value="true"/>
             <property name="separated" value="true"/>
-            <property name="option" value="bottom"/>
-            <property name="staticGroups" value="au,bsh,ca,com,de,info,io,jakarta,java,javax,jdk,jetbrains,joptsimple,junit,net,org"/>
             <property name="separatedStaticGroups" value="true"/>
         </module>
 
@@ -204,8 +195,8 @@
             <property name="tokens" value="LITERAL_DO, LITERAL_ELSE, LITERAL_FINALLY, LITERAL_IF, LITERAL_FOR, LITERAL_TRY, LITERAL_WHILE, STATIC_INIT"/>
         </module>
         <module name="LeftCurly">
-            <!-- Omit LITERAL_CASE, LITERAL_DEFAULT -->
-            <property name="tokens" value="ANNOTATION_DEF, CLASS_DEF, CTOR_DEF, ENUM_CONSTANT_DEF, ENUM_DEF, INTERFACE_DEF, LAMBDA, LITERAL_CATCH, LITERAL_DO, LITERAL_ELSE, LITERAL_FINALLY, LITERAL_FOR, LITERAL_IF, LITERAL_SWITCH, LITERAL_SYNCHRONIZED, LITERAL_TRY, LITERAL_WHILE, METHOD_DEF, OBJBLOCK, STATIC_INIT, RECORD_DEF, COMPACT_CTOR_DEF"/>
+            <!-- Omit LITERAL_CASE -->
+            <property name="tokens" value="ANNOTATION_DEF, CLASS_DEF, CTOR_DEF, ENUM_CONSTANT_DEF, ENUM_DEF, INTERFACE_DEF, LAMBDA, LITERAL_CATCH, LITERAL_DEFAULT, LITERAL_DO, LITERAL_ELSE, LITERAL_FINALLY, LITERAL_FOR, LITERAL_IF, LITERAL_SWITCH, LITERAL_SYNCHRONIZED, LITERAL_TRY, LITERAL_WHILE, METHOD_DEF, OBJBLOCK, STATIC_INIT, RECORD_DEF, COMPACT_CTOR_DEF"/>
         </module>
 <!--    <module name="NeedBraces"/> -->
         <module name="RightCurly"/>

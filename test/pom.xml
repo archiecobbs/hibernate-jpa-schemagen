@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project
+  xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.dellroad</groupId>
+        <artifactId>hibernate-jpa-schemagen</artifactId>
+        <version>7.2.1</version>
+    </parent>
+    <artifactId>hibernate-jpa-schemagen-test</artifactId>
+    <name>Hibernate+JPA Schema Generator Example/Test</name>
+    <properties>
+        <automatic.module.name>${hibernate-jpa-schemagen.package.root}.test</automatic.module.name>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>jakarta.persistence</groupId>
+            <artifactId>jakarta.persistence-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.orm</groupId>
+            <artifactId>hibernate-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+
+        <plugins>
+
+            <!-- Compile -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <release>${java.version}</release>
+                    <showWarnings>true</showWarnings>
+                    <compilerArgs>
+                        <arg>-Xlint:all,-processing,-path</arg>
+                    <!--
+                        <arg>-Werror</arg>
+                    -->
+                        <arg>-AaddSuppressWarningsAnnotation=true</arg>
+                        <arg>-implicit:class</arg>
+                    </compilerArgs>
+                    <annotationProcessorPaths>
+                        <annotationProcessorPath>
+                            <groupId>org.hibernate</groupId>
+                            <artifactId>hibernate-jpamodelgen</artifactId>
+                            <version>${hibernate.version}</version>
+                        </annotationProcessorPath>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+
+            <!-- Schema generation and verification -->
+            <plugin>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>hibernate-jpa-schemagen-maven-plugin</artifactId>
+                <version>${project.version}</version>
+                <executions>
+                    <execution>
+                        <id>schema_verify</id>
+                        <configuration>
+                            <dialect>org.hibernate.dialect.MariaDBDialect</dialect>
+                            <outputFile>${project.build.outputDirectory}/generated-schema.sql</outputFile>
+                            <verifyFile>${project.basedir}/src/schema/expected-schema.sql</verifyFile>
+                            <fixups>
+                                <fixup>
+                                    <pattern>(?m)(^    | +$)</pattern>
+                                    <replacement/>
+                                </fixup>
+                                <!-- Set character set and collation to UTF-8 -->
+                                <fixup>
+                                    <pattern>InnoDB;</pattern>
+                                    <replacement>InnoDB default charset=utf8mb4 collate=utf8mb4_bin;</replacement>
+                                </fixup>
+                                <fixup>
+                                    <pattern>(?&lt;!\S)(bit|boolean)(?!\S)</pattern>
+                                    <replacement>tinyint(1)</replacement>
+                                </fixup>
+                                <fixup>
+                                    <pattern>datetime\(6\)</pattern>
+                                    <replacement>datetime</replacement>
+                                </fixup>
+                            </fixups>
+                        </configuration>
+                        <goals>
+                            <goal>export-jpa-schema</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

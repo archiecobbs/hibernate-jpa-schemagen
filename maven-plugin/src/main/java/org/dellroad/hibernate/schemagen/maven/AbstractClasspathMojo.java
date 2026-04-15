@@ -3,7 +3,7 @@
  * Copyright (C) 2023 Archie L. Cobbs. All rights reserved.
  */
 
-package org.dellroad.hibernate.maven;
+package org.dellroad.hibernate.schemagen.maven;
 
 import java.io.File;
 import java.net.MalformedURLException;

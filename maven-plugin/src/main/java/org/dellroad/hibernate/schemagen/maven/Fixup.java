@@ -3,7 +3,7 @@
  * Copyright (C) 2023 Archie L. Cobbs. All rights reserved.
  */
 
-package org.dellroad.hibernate.maven;
+package org.dellroad.hibernate.schemagen.maven;
 
 import java.util.Optional;
 import java.util.regex.Pattern;

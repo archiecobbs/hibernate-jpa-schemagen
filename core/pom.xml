@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project
+  xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.dellroad</groupId>
+        <artifactId>hibernate-jpa-schemagen</artifactId>
+        <version>7.2.1</version>
+    </parent>
+    <artifactId>hibernate-jpa-schemagen-core</artifactId>
+    <name>Hibernate+JPA Schema Generator Core Classes</name>
+    <properties>
+        <jakarta.el.version>4.0.2</jakarta.el.version>
+        <automatic.module.name>${hibernate-jpa-schemagen.package.root}.core</automatic.module.name>
+    </properties>
+    <dependencies>
+
+        <!-- Hibernate stuff -->
+        <dependency>
+            <groupId>org.hibernate.tool</groupId>
+            <artifactId>hibernate-tools-orm</artifactId>
+            <version>${hibernate.version}</version>
+        </dependency>
+
+        <!-- Validation API (dependency missing from Hibernate) -->
+        <dependency>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+        </dependency>
+
+        <!-- Required to fix NoClassDefFoundError: jakarta/el/ELManager -->
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>jakarta.el</artifactId>
+            <version>${jakarta.el.version}</version>
+        </dependency>
+
+        <!-- Misc utility -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+
+        <!-- Logging -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+        </dependency>
+    </dependencies>
+</project>
