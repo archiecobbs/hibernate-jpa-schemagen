@@ -1,4 +1,4 @@
-Version 7.2.1
+Version 7.2.1 Released April 17, 2026
 
     - Refactor into sub-modules and add tests.
       NOTE: New plugin artifact name "hibernate-jpa-schemagen-maven-plugin"
