@@ -1,3 +1,7 @@
+Version 7.1.2
+
+    - Fix bug where output file was empty.
+
 Version 7.1.1 Released April 8, 2026
 
     - Add dependency on org.glassfish:jakarta.el.
