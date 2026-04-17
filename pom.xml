@@ -301,7 +301,7 @@
 
         <!-- Maven Central requires signed artifacts -->
         <profile>
-            <id>sign</id>
+            <id>central</id>
             <build>
                 <plugins>
                     <plugin>
