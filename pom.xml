@@ -26,6 +26,7 @@
         <java.version>17</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <hibernate.version>7.2.11.Final</hibernate.version>
+        <hibernate.short.version>7.2</hibernate.short.version><!-- this should agree with ${hibernate.version} -->
         <hibernate-jpa-schemagen.package.root>org.dellroad.hibernate.schemagen</hibernate-jpa-schemagen.package.root>
     </properties>
     <licenses>
@@ -129,6 +130,35 @@
                 <executions>
                     <execution>
                         <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Javadoc -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <source>${javadoc.target}</source>
+                    <notimestamp>true</notimestamp>
+                    <validateLinks>true</validateLinks>
+                    <doclint>all,-missing</doclint>
+                    <additionalJOptions>
+                        <additionalJOption>-Xmaxwarns</additionalJOption>
+                        <additionalJOption>65536</additionalJOption>
+                    </additionalJOptions>
+                    <links combine.children="append">
+                        <link>https://docs.hibernate.org/orm/${hibernate.short.version}/javadocs/</link>
+                        <link>https://www.slf4j.org/apidocs/</link>
+                        <link>https://maven.apache.org/ref/${plugin-api.version}/apidocs/</link>
+                    </links>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
                         <goals>
                             <goal>jar</goal>
                         </goals>
