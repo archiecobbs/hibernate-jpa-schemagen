@@ -273,11 +273,6 @@
                         <additionalJOption>-Xmaxwarns</additionalJOption>
                         <additionalJOption>65536</additionalJOption>
                     </additionalJOptions>
-                    <links>
-                        <link>https://docs.hibernate.org/orm/${hibernate.short.version}/javadocs/</link>
-                        <link>https://www.slf4j.org/apidocs/</link>
-                        <link>https://maven.apache.org/ref/${plugin-api.version}/apidocs/</link>
-                    </links>
                 </configuration>
                 <executions>
                     <execution>
