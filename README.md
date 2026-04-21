@@ -20,24 +20,26 @@ And you might also have one of these issues:
 
 ### Overview
 
-What this Maven plugin does:
+What the Maven plugin does:
 
-* Writes the DDL schema generated from JPA meta-data to an output file without requiring a database connection
-* Allows you to easily apply regular expression match/replace edits to the generated schema
-* Checks that the generated schema matches what you expect, and fails the build if it doesn't
+* Writes the DDL schema generated from JPA meta-data to an output file
+* Applies regular expression match/replace edits to the generated schema
+* Verifies that the resulting schema matches what you expect
 
 ### Configuring the Plugin
 
 Note: For versions 7.2.1 and later, the artifact name of this plugin is `hibernate-jpa-schemagen-maven-plugin`; for earlier versions, use `hibernate-jpa-schemagen`.
 
-Each version of this plugin has a version number that matches the version of Hibernate against which it was compiled in the major and minor components (i.e., first two numbers), so for example for Hibernate version `6.4.1.Final` you should use the latest 6.4.x version of this plugin.
+Each version of this plugin has a version number that matches the version of Hibernate against which it was compiled in the major and minor components (i.e., first two numbers), so for example for Hibernate version `7.2.7.Final` you should use the latest 7.2.x version of this plugin.
+
+You can see a demonstration [here](https://github.com/archiecobbs/hibernate-jpa-schemagen/blob/main/test).
 
 Example configuration:
 ```xml
 <plugin>
     <groupId>org.dellroad</groupId>
     <artifactId>hibernate-jpa-schemagen</artifactId>
-    <version>6.4.0</version>
+    <version>7.2.1</version>
     <executions>
         <execution>
             <id>schema_verify</id>
@@ -99,7 +101,7 @@ By default, the plugin runs in the `process-classes` Maven lifecycle phase.
 
 Even if it's not needed at runtime, a `META-INF/persistence.xml` file is required during the build for this plugin to work. You can either provide a `META-INF/persistence.xml` file if you already have one, or have a temporary one generated for you.
 
-#### Provide Your Own `META-INF/persistence.xml`
+#### Option 1: Provide Your Own `META-INF/persistence.xml`
 
 If you want to provide your own `META-INF/persistence.xml` file, the plugin expects to find it under the same root as your compiled JPA classes (usually `target/classes`). This means you should include it as a Maven `<resource>` that gets copied into place.
 
@@ -124,7 +126,7 @@ When providing your own `META-INF/persistence.xml`:
 * `<dialect>` is not allowed
 * `<removePersistenceXml>` defaults to `false`
 
-#### Generate a Templorary `META-INF/persistence.xml`
+#### Option 2: Generate a Templorary `META-INF/persistence.xml`
 
 If you don't have a `META-INF/persistence.xml`, then the plugin can generate a temporary one for you that looks like the example above.
 
