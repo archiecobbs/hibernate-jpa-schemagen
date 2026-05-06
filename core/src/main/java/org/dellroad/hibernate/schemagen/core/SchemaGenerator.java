@@ -232,13 +232,18 @@ public class SchemaGenerator {
             this.log.debug(String.format("Generated persistence.xml:%n%s", content));
 
         // Write out result
-        if (!persistenceXml.getParentFile().mkdirs())
-            throw new IOException("failed to create directory " + persistenceXml.getParentFile());
+        this.createDirectory(persistenceXml.getParentFile());
         try (Writer out = new OutputStreamWriter(new FileOutputStream(persistenceXml), StandardCharsets.UTF_8)) {
             out.write(content);
         } catch (IOException e) {
             throw new IOException(String.format("Error writing %s generated from template", persistenceXml), e);
         }
+    }
+
+    protected void createDirectory(File file) throws IOException {
+        Preconditions.checkArgument(file != null, "null file");
+        if (!file.isDirectory() && !file.mkdirs())
+            throw new IOException("failed to create directory " + file);
     }
 
     protected MetadataDescriptor createMetadataDescriptor(Properties properties) {

@@ -1,3 +1,7 @@
+Version 7.2.2
+
+    - Don't fail if the META-INF directory already exists (#3).
+
 Version 7.2.1 Released April 17, 2026
 
     - Refactor into sub-modules and add tests.
