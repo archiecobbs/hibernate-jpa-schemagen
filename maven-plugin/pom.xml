@@ -8,7 +8,7 @@
     <parent>
         <groupId>org.dellroad</groupId>
         <artifactId>hibernate-jpa-schemagen</artifactId>
-        <version>7.2.1</version>
+        <version>7.2.2</version>
     </parent>
     <artifactId>hibernate-jpa-schemagen-maven-plugin</artifactId>
     <name>Hibernate+JPA Schema Generator Maven Plugin</name>

@@ -12,7 +12,7 @@
     </parent>
     <groupId>org.dellroad</groupId>
     <artifactId>hibernate-jpa-schemagen</artifactId>
-    <version>7.2.1</version>
+    <version>7.2.2</version>
     <name>Hibernate+JPA Schema Generator</name>
     <packaging>pom</packaging>
     <description>Sensible Maven schema DDL generator for projects using Hibernate and JPA</description>

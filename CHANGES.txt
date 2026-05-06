@@ -1,4 +1,4 @@
-Version 7.2.2
+Version 7.2.2 Released May 6, 2026
 
     - Don't fail if the META-INF directory already exists (#3).
 
