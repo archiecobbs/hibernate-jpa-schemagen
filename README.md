@@ -38,7 +38,7 @@ Example configuration:
 ```xml
 <plugin>
     <groupId>org.dellroad</groupId>
-    <artifactId>hibernate-jpa-schemagen</artifactId>
+    <artifactId>hibernate-jpa-schemagen-maven-plugin</artifactId>
     <version>7.2.1</version>
     <executions>
         <execution>
